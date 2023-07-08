@@ -17,8 +17,8 @@
         <label for="email">Email :</label>
         <input type="email" name="email" required><br>
 
-        <label for="motdepasse">Mot de passe :</label>
-        <input type="password" name="motdepasse" required><br>
+        <label for="mot_de_passe">Mot de passe :</label>
+        <input type="password" name="mot_de_passe" required><br>
 
         <label for="telephone">Numéro de téléphone :</label>
         <input type="tel" name="telephone" pattern="[0-9]{10}" required><br>
@@ -58,7 +58,7 @@ if (!$conn) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nom = $_POST["nom"];
     $email = $_POST["email"];
-    $motdepasse = $_POST["motdepasse"];
+    $mot_de_passe = password_hash($_POST["mot_de_passe"], PASSWORD_DEFAULT);
     $telephone = $_POST["telephone"];
     $adresse = $_POST["adresse"];
     $date_naissance = $_POST["date_naissance"];
@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Effectuer des vérifications et validations supplémentaires ici
 
     // Insérer les données dans la base de données
-    $query = "INSERT INTO utilisateurs (nom, email, motdepasse, telephone, adresse, date_naissance, profession, genre) VALUES ('$nom', '$email', '$motdepasse', '$telephone', '$adresse', '$date_naissance', '$profession', '$genre')";
+    $query = "INSERT INTO utilisateurs (nom, email, mot_de_passe, telephone, adresse, date_naissance, profession, genre) VALUES ('$nom', '$email', '$mot_de_passe', '$telephone', '$adresse', '$date_naissance', '$profession', '$genre')";
     $result = mysqli_query($conn, $query);
 
     if ($result) {

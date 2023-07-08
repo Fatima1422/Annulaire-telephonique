@@ -53,6 +53,9 @@
     </style>
 </head>
 <body>
+
+    <?php session_start(); ?>
+    
     <div class="container">
         <h2>Bienvenue dans l'annuaire téléphonique</h2>
         <div class="user-info">
@@ -110,6 +113,7 @@
         <div class="add-form">
             <h3>Ajouter un nouveau contact</h3>
             <form method="POST" action="ajout_contact.php">
+                <input type="text" name="utilisateur_id" class="add-input" placeholder="utilisateur_id" required>
                 <input type="text" name="nom" class="add-input" placeholder="Nom" required>
                 <input type="tel" name="numero_telephone" class="add-input" placeholder="Numéro de téléphone" required>
                 <textarea name="adresse" class="add-input" placeholder="Adresse" required></textarea>

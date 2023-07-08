@@ -9,60 +9,71 @@
         <label for="email">Email :</label>
         <input type="email" name="email" required><br>
 
-        <label for="motdepasse">Mot de passe :</label>
-        <input type="password" name="motdepasse" required><br>
+        <label for="mot_de_passe">Mot de passe :</label>
+        <input type="password" name="mot_de_passe" required><br>
 
         <input type="submit" value="Se connecter">
     </form>
     <?php if (isset($erreur)) { ?>
-        <p class="error"><?php echo $erreur; ?></p>
-    <?php } ?>
+    <p class="error"><?php echo $erreur; ?></p>
+<?php } ?>
+
 </body>
 </html>
 <?php
 session_start();
 
+
+$host = "localhost";
+$username = "root";
+$password = "";
+$database = "annulaire_tel";
+
+$conn = mysqli_connect($host, $username, $password, $database);
+
+if (!$conn) {
+    die("Erreur de connexion à la base de données : " . mysqli_connect_error());
+}
+
 // Vérifier si l'utilisateur est déjà connecté, le rediriger vers la page d'accueil
 if (isset($_SESSION["email"])) {
-    header("Location: accueil.php");
+    header("Location: acceuil.php");
     exit();
 }
 
 // Traitement des données de connexion
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST["email"];
-    $motdepasse = $_POST["motdepasse"];
+$email = $_POST["email"];
+$mot_de_passe = password_hash($_POST["mot_de_passe"], PASSWORD_DEFAULT);
 
-    // Vérifier les informations de connexion
-    // Connexion à la base de données
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "annulaire_tel";
+// Requête de vérification des informations de connexion
+$query = "SELECT * FROM utilisateurs WHERE email = '$email'";
+$result = mysqli_query($conn, $query);
 
-    $conn = mysqli_connect($host, $username, $password, $database);
+if (mysqli_num_rows($result) == 1) {
+    $user = mysqli_fetch_assoc($result);
 
-    if (!$conn) {
-        die("Erreur de connexion à la base de données : " . mysqli_connect_error());
+    if (password_verify($_POST["mot_de_passe"], $user["mot_de_passe"])) {
+        // Informations de connexion correctes
+        $_SESSION["email"] = $email;
+        $_SESSION["utilisateur_id"] = $user["id"]; // Attribuer l'ID de l'utilisateur à la variable de session
+
+        // Définir les clés "nom" et "adresse" dans $_SESSION
+        $_SESSION["nom"] = $user["nom"];
+        $_SESSION["adresse"] = $user["adresse"];
+
+        header("Location: acceuil.php"); // Rediriger vers la page d'accueil après la connexion
+        exit();
+    } else {
+        // Mot de passe incorrect
+        $erreur = "Mot de passe incorrect.";
     }
-
-    // Requête de vérification des informations de connexion
-    $query = "SELECT * FROM utilisateurs WHERE email = '$email'";
-    $result = mysqli_query($conn, $query);
-
-    if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
-        if (password_verify($motdepasse, $user["motdepasse"])) {
-            // Informations de connexion correctes
-            $_SESSION["email"] = $email;
-            header("Location: accueil.php"); // Rediriger vers la page d'accueil après la connexion
-            exit();
-        }
-    }
-
-    // Informations de connexion incorrectes
+} else {
+    // Aucun utilisateur correspondant trouvé
     $erreur = "Email ou mot de passe incorrect.";
 }
+
+// ...
+
 
 // Fermeture de la connexion à la base de données
 mysqli_close($conn);
